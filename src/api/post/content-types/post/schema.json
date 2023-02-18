@@ -48,7 +48,7 @@
       "target": "api::author.author",
       "inversedBy": "posts"
     },
-    "publish_date": {
+    "publishDate": {
       "type": "date",
       "required": true,
       "unique": false
