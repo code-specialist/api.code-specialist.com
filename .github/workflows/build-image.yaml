@@ -37,4 +37,4 @@ jobs:
           .
 
       - name: Push the image
-        run: docker push
+        run: docker push ghcr.io/code-specialist/api.code-specialist.com:${{ github.sha }}
