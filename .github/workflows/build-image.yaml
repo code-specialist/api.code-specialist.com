@@ -29,9 +29,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Build the company-service Docker Image
+      - name: Build the Strapi Docker Image
         run: >
           docker build
           --progress=plain
           --tag ghcr.io/code-specialist/api.code-specialist.com:${{ github.sha }}
           .
+
+      - name: Push the image
+        run: docker push
