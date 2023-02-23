@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: strapi-database-pv
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  hostPath:
+    path: "/var/lib/rancher/k3s/storage/strapi-database-pv"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: strapi-database-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strapi-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: strapi-db
+  template:
+    metadata:
+      labels:
+        app: strapi-db
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          securityContext:
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 3306
+              name: mysql
+          envFrom:
+            - configMapRef:
+                name: strapi-database-conf
+            - secretRef:
+                name: strapi-database-secret 
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: strapi-database-pvc
+            
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: strapi-db 
+spec:
+  selector:
+    app: strapi-db
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: mysql

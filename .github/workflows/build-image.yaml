@@ -31,6 +31,7 @@ jobs:
 
       - name: Build the Strapi Docker Image
         run: >
+          cd strapi
           docker build
           --progress=plain
           --tag ghcr.io/code-specialist/api.code-specialist.com:${{ github.sha }}
