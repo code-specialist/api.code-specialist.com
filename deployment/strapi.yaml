@@ -1,20 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: strapi-database-conf
+  name: strapi-postgres
 data:
-  MYSQL_USER: strapi
-  MYSQL_DATABASE: strapi-k8s
-
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: strapi-database-secret
-type: Opaque
-data:
-  MYSQL_ROOT_PASSWORD: <secret>
-  MYSQL_PASSWORD: <secret>
+  POSTGRES_USER: strapi
+  POSTGRES_PASSWORD: strapi-k8s
 
 ---
 apiVersion: v1
@@ -26,19 +16,6 @@ data:
   PORT: "1337"
   NODE_ENV: production
   DATABASE_HOST: strapi-db
-  DATABASE_PORT: "3306"
+  DATABASE_PORT: "5432"
   DATABASE_USERNAME: strapi
   DATABASE_NAME: strapi-k8s
-
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: strapi-app-secret
-type: Opaque
-data:
-  APP_KEYS: <secret>
-  API_TOKEN_SALT: <secret>
-  ADMIN_JWT_SECRET: <secret>
-  JWT_SECRET: <secret>
-  DATABASE_PASSWORD: <secret>

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: strapi-database-pv
+  name: strapi-db-pv
   labels:
     type: local
 spec:
@@ -11,13 +11,13 @@ spec:
     - ReadWriteOnce
   storageClassName: local-path
   hostPath:
-    path: "/var/lib/rancher/k3s/storage/strapi-database-pv"
+    path: "/var/lib/rancher/k3s/storage/strapi-db-pv"
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: strapi-database-pvc
+  name: strapi-db-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -41,37 +41,43 @@ spec:
         app: strapi-db
     spec:
       containers:
-        - name: mysql
-          image: mysql:5.7
-          securityContext:
-            runAsUser: 1000
-            allowPrivilegeEscalation: false
+        - name: postgresql
+          image: postgres:14.1-alpine
+          env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata # Workarround see https://github.com/docker-library/postgres/issues/696
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "512m"
+            limits:
+              memory: "1024Mi"
+              cpu: "2048m"
           ports:
-            - containerPort: 3306
-              name: mysql
+            - containerPort: 5432
+              name: postgresql
           envFrom:
             - configMapRef:
-                name: strapi-database-conf
+                name: strapi-postgres
             - secretRef:
-                name: strapi-database-secret 
+                name: strapi-postgres-secret # Managed by external secret store
           volumeMounts:
-            - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgresql/data
       volumes:
-        - name: mysql-persistent-storage
+        - name: postgres-persistent-storage
           persistentVolumeClaim:
-            claimName: strapi-database-pvc
-            
+            claimName: strapi-db-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: strapi-db 
+  name: strapi-db
 spec:
   selector:
     app: strapi-db
   ports:
-    - name: mysql
+    - name: postgresql
       protocol: TCP
-      port: 3306
-      targetPort: mysql
+      port: 5432
+      targetPort: postgresql
