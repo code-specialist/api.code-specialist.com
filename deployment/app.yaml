@@ -12,18 +12,19 @@ spec:
       labels:
         app: strapi-app
     spec:
+      imagePullSecrets:
+        - name: ghcr.io-pull-secret # Managed in the cluster
       containers:
         - name: strapi
           image: ghcr.io/code-specialist/api.code-specialist.com:7c06ad210ff1dde4fed54d5ae9fb5c7ed52a0c8f
-          ports:
-            - containerPort: 1337
-              name: http
-          envFrom:
-            - configMapRef:
-                name: strapi-app-conf 
-            - secretRef:
-                name: strapi-app-secret
-                
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "512m"
+            limits:
+              memory: "1024Mi"
+              cpu: "2048m"
+
 ---
 apiVersion: v1
 kind: Service
