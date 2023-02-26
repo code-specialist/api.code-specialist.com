@@ -4,8 +4,7 @@ metadata:
   name: strapi-postgres
 data:
   POSTGRES_USER: strapi
-  POSTGRES_PASSWORD: strapi-k8s
-
+  POSTGRES_DB: strapi-db
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -18,4 +17,4 @@ data:
   DATABASE_HOST: strapi-db
   DATABASE_PORT: "5432"
   DATABASE_USERNAME: strapi
-  DATABASE_NAME: strapi-k8s
+  DATABASE_NAME: strapi-db
