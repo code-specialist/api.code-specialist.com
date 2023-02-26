@@ -24,15 +24,6 @@ spec:
             limits:
               memory: "1024Mi"
               cpu: "2048m"
-          ports:
-            - containerPort: 1337
-              name: http
-          envFrom:
-            - configMapRef:
-                name: strapi-app-conf 
-            - secretRef:
-                name: strapi-app-secret # Managed by external secret
-
 
 ---
 apiVersion: v1
